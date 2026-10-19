@@ -3,34 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Legume Games</title>
+  <meta name="theme-color" content="#10111b">
+  <title>Legume | Play Games</title>
   <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10111b;
+      --panel: #191b2a;
+      --panel-hover: #22253a;
+      --text: #f5f6ff;
+      --muted: #a5a8c2;
+      --accent: #a7f36b;
+      --accent-dark: #243a20;
+      --border: rgba(255,255,255,.09);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      padding: 50px 20px;
-      background: #10131a;
-      color: #f5f5f5;
-      font-family: Arial, sans-serif;
-      text-align: center;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(102, 79, 205, .19), transparent 38rem),
+        radial-gradient(ellipse at 95% 12%, rgba(111, 210, 93, .10), transparent 32rem),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    h1 { font-size: 48px; margin-bottom: 8px; }
-    p { color: #aeb6c5; }
-    .game {
-      display: inline-block;
-      margin-top: 24px;
-      padding: 18px 28px;
-      background: #202736;
-      border-radius: 12px;
-      color: white;
-      text-decoration: none;
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(1180px, calc(100% - 36px)); margin: 0 auto; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 18px; padding: 24px 0;
+      border-bottom: 1px solid var(--border);
     }
-    .game:hover { background: #303c51; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font-size: 1.25rem; font-weight: 900; letter-spacing: -.04em; }
+    .brand-mark {
+      width: 39px; height: 39px; display: grid; place-items: center;
+      border-radius: 13px; color: #11150f; background: var(--accent);
+      font-size: 1.25rem; box-shadow: 0 0 28px rgba(167,243,107,.17);
+    }
+    .top-note { color: var(--muted); font-size: .9rem; }
+    .hero { padding: 52px 0 30px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px;
+      border: 1px solid rgba(167,243,107,.25); border-radius: 999px;
+      background: rgba(167,243,107,.07); color: var(--accent);
+      font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    }
+    h1 { margin: 17px 0 12px; max-width: 760px; font-size: clamp(2.5rem, 7vw, 5rem); line-height: .98; letter-spacing: -.065em; }
+    h1 span { color: var(--accent); }
+    .intro { max-width: 590px; margin: 0; color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 28px 0 18px; }
+    .search-wrap { position: relative; flex: 1 1 300px; }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    #search {
+      width: 100%; min-height: 52px; padding: 0 16px 0 46px; border: 1px solid var(--border);
+      border-radius: 15px; outline: none; color: var(--text); background: rgba(25,27,42,.92);
+      font: inherit; transition: border-color .2s, box-shadow .2s;
+    }
+    #search:focus { border-color: rgba(167,243,107,.7); box-shadow: 0 0 0 3px rgba(167,243,107,.10); }
+    .count { color: var(--muted); font-size: .9rem; white-space: nowrap; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin: 30px 0 16px; }
+    h2 { margin: 0; font-size: 1.3rem; letter-spacing: -.03em; }
+    .section-subtitle { margin-top: 5px; color: var(--muted); font-size: .88rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 13px; padding-bottom: 50px; }
+    .game-card {
+      position: relative; display: flex; min-height: 135px; flex-direction: column; justify-content: space-between;
+      padding: 17px; overflow: hidden; border: 1px solid var(--border); border-radius: 18px;
+      background: linear-gradient(145deg, rgba(31,34,53,.96), rgba(23,25,39,.96));
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .game-card::after {
+      content: ""; position: absolute; width: 95px; height: 95px; right: -35px; top: -38px;
+      border-radius: 50%; background: var(--glow, rgba(167,243,107,.10)); filter: blur(1px);
+      transition: transform .2s ease;
+    }
+    .game-card:hover, .game-card:focus-visible { transform: translateY(-3px); border-color: rgba(167,243,107,.48); background: var(--panel-hover); outline: none; }
+    .game-card:hover::after { transform: scale(1.35); }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; position: relative; z-index: 1; }
+    .game-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; background: rgba(255,255,255,.07); font-size: 1.35rem; }
+    .play-mark { color: var(--accent); font-size: 1.2rem; opacity: .85; }
+    .game-title { position: relative; z-index: 1; margin-top: 22px; font-weight: 800; font-size: 1rem; line-height: 1.3; }
+    .game-category { position: relative; z-index: 1; margin-top: 6px; color: var(--muted); font-size: .78rem; }
+    .empty { display: none; padding: 42px 20px; border: 1px dashed var(--border); border-radius: 18px; color: var(--muted); text-align: center; }
+    footer { border-top: 1px solid var(--border); padding: 22px 0 30px; color: var(--muted); font-size: .85rem; }
+    footer .shell { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 24px, 1180px); }
+      header { padding: 17px 0; }
+      .top-note { font-size: .78rem; text-align: right; }
+      .hero { padding-top: 39px; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .game-card { min-height: 128px; padding: 13px; border-radius: 15px; }
+      .game-icon { width: 37px; height: 37px; }
+      .game-title { font-size: .92rem; }
+      .count { width: 100%; }
+    }
+    @media (max-width: 350px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <h1>Legume</h1>
-  <p>Your games, all in one place.</p>
-  <a class="game" href="/games/idle-breakout.html">Idle Breakout</a>
-  <a class="game" href="/games/Pizza Supremacy.html">Pizza Supremacy</a>
+  <div class="shell">
+    <header>
+      <a class="brand" href="/" aria-label="Legume home">
+        <span class="brand-mark">L</span><span>Legume</span>
+      </a>
+      <div class="top-note">Your little corner of the internet for games.</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow"><span>✦</span> The game library</div>
+        <h1>Pick a game.<br><span>Get playing.</span></h1>
+        <p class="intro">Browse the collection, search for a favorite, and jump straight into the game.</p>
+
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="search" type="search" placeholder="Search games..." autocomplete="off" aria-label="Search games">
+          </div>
+          <div class="count" id="count" aria-live="polite">Loading games...</div>
+        </div>
+      </section>
+
+      <section aria-labelledby="games-heading">
+        <div class="section-heading">
+          <div>
+            <h2 id="games-heading">All games</h2>
+            <div class="section-subtitle">Choose a card to launch a game.</div>
+          </div>
+        </div>
+        <div class="grid" id="game-grid"></div>
+        <div class="empty" id="empty">No games match that search. Try another title.</div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell">
+        <span>© Legume</span>
+        <span>Made for curious clickers.</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Keep each filename exactly as it exists in /public/games/.
+    const games = [
+      { title: "Cookie Clicker", file: "Cookie Clicker.html", category: "Idle", icon: "🍪" },
+      { title: "Pizza Supremacy", file: "Pizza Supremacy.html", category: "Cooking", icon: "🍕" },
+      { title: "Pokémon FireRed", file: "Pokemon Firered.html", category: "Adventure", icon: "🔥" },
+      { title: "Retro Bowl", file: "Retro Bowl.html", category: "Sports", icon: "🏈" },
+      { title: "Super Mario 64", file: "SM64.html", category: "Platformer", icon: "🍄" },
+      { title: "Fireboy and Watergirl", file: "fireboy-and-watergirl.html", category: "Puzzle", icon: "🔥" },
+      { title: "Fireboy and Watergirl 2", file: "fireboy-and-watergirl-2.html", category: "Puzzle", icon: "💧" },
+      { title: "Fireboy and Watergirl 3", file: "fireboy-and-watergirl-3.html", category: "Puzzle", icon: "💎" },
+      { title: "Fireboy and Watergirl 4", file: "fireboy-and-watergirl-4.html", category: "Puzzle", icon: "🌲" },
+      { title: "Five Nights at Freddy's", file: "fnaf.html", category: "Horror", icon: "🐻" },
+      { title: "Five Nights at Freddy's 2", file: "fnaf-2.html", category: "Horror", icon: "🐰" },
+      { title: "Five Nights at Freddy's 3", file: "fnaf-3.html", category: "Horror", icon: "🐻" },
+      { title: "Five Nights at Freddy's 4", file: "fnaf-4.html", category: "Horror", icon: "🌙" },
+      { title: "FNAF: Sister Location", file: "fnaf-sister-location.html", category: "Horror", icon: "🎭" },
+      { title: "Geometry Dash", file: "geometry-dash.html", category: "Rhythm", icon: "🔺" },
+      { title: "Gladi Hoppers", file: "gladi-hoppers.html", category: "Action", icon: "⚔️" },
+      { title: "Granny", file: "granny.html", category: "Horror", icon: "👵" },
+      { title: "Idle Breakout", file: "idle-breakout.html", category: "Idle", icon: "🧱" },
+      { title: "Learn to Fly 2", file: "learn-to-fly-2.html", category: "Arcade", icon: "🐧" },
+      { title: "Learn to Fly 3", file: "learn-to-fly-3.html", category: "Arcade", icon: "🚀" },
+      { title: "Little Alchemy 2", file: "little-alchemy-2.html", category: "Puzzle", icon: "⚗️" },
+      { title: "Melon Playground", file: "melon-playground.html", category: "Sandbox", icon: "🍉" },
+      { title: "Moto X3M", file: "moto-x3m.htm", category: "Racing", icon: "🏍️" },
+      { title: "Moto X3M 2", file: "moto-x3m-2.html", category: "Racing", icon: "🏁" },
+      { title: "Moto X3M 3", file: "moto-x3m-3.html", category: "Racing", icon: "🏁" },
+      { title: "Moto X3M Pool Party", file: "moto-x3m-pool-party.html", category: "Racing", icon: "🌊" },
+      { title: "Moto X3M Spooky Land", file: "moto-x3m-spooky-land.html", category: "Racing", icon: "🎃" },
+      { title: "Moto X3M Winter", file: "moto-x3m-winter.html", category: "Racing", icon: "❄️" },
+      { title: "Papa's Bakeria", file: "papas-bakeria.html", category: "Cooking", icon: "🥐" },
+      { title: "Papa's Burgeria", file: "papas-burgeria.html", category: "Cooking", icon: "🍔" },
+      { title: "Papa's Cheeseria", file: "papas-cheeseria.html", category: "Cooking", icon: "🧀" },
+      { title: "Papa's Cupcakeria", file: "papas-cupcakeria.html", category: "Cooking", icon: "🧁" },
+      { title: "Papa's Donuteria", file: "papas-donuteria.html", category: "Cooking", icon: "🍩" },
+      { title: "Papa's Freezeria", file: "papas-freezeria.html", category: "Cooking", icon: "🍦" },
+      { title: "Papa's Hot Doggeria", file: "papas-hot-doggeria.html", category: "Cooking", icon: "🌭" },
+      { title: "Papa's Pancakeria", file: "papas-pancakeria.html", category: "Cooking", icon: "🥞" },
+      { title: "Papa's Pastaria", file: "papas-pastaria.html", category: "Cooking", icon: "🍝" },
+      { title: "Papa's Pizzeria", file: "papas-pizzeria.html", category: "Cooking", icon: "🍕" },
+      { title: "Papa's Scooperia", file: "papas-scooperia.html", category: "Cooking", icon: "🍨" },
+      { title: "Papa's Sushiria", file: "papas-sushiria.html", category: "Cooking", icon: "🍣" },
+      { title: "Papa's Taco Mia", file: "papas-taco-mia.html", category: "Cooking", icon: "🌮" },
+      { title: "Papa's Wingeria", file: "papas-wingeria.html", category: "Cooking", icon: "🍗" },
+      { title: "Riddle School 2", file: "riddle-school-2.html", category: "Puzzle", icon: "🧩" },
+      { title: "Riddle School 3", file: "riddle-school-3.html", category: "Puzzle", icon: "🧩" },
+      { title: "Riddle School 4", file: "riddle-school-4.html", category: "Puzzle", icon: "🧩" },
+      { title: "Riddle School 5", file: "riddle-school-5.html", category: "Puzzle", icon: "🧩" },
+      { title: "Run 3", file: "run-3.html", category: "Platformer", icon: "🏃" },
+      { title: "Slope", file: "slope.html", category: "Arcade", icon: "🟢" },
+      { title: "Stick Archers Battle", file: "stick-archers-battle.html", category: "Action", icon: "🏹" },
+      { title: "Territorial.io", file: "territorial-io.html", category: "Strategy", icon: "🌍" },
+      { title: "Tiny Fishing", file: "tiny-fishing.html", category: "Casual", icon: "🎣" },
+      { title: "Tomb of the Mask", file: "tomb-of-the-mask.htm", category: "Arcade", icon: "🟡" }
+    ];
+
+    const grid = document.getElementById("game-grid");
+    const search = document.getElementById("search");
+    const count = document.getElementById("count");
+    const empty = document.getElementById("empty");
+
+    function renderGames(query = "") {
+      const normalized = query.trim().toLowerCase();
+      const filtered = games.filter(game =>
+        `${game.title} ${game.category} ${game.file}`.toLowerCase().includes(normalized)
+      );
+
+      grid.innerHTML = filtered.map(game => `
+        <a class="game-card" href="/games/${encodeURIComponent(game.file).replace(/%2F/gi, "/")}" style="--glow: ${game.category === "Horror" ? "rgba(255,90,105,.12)" : game.category === "Cooking" ? "rgba(255,180,80,.12)" : "rgba(167,243,107,.10)"}" aria-label="Play ${game.title}">
+          <div class="card-top">
+            <span class="game-icon" aria-hidden="true">${game.icon}</span>
+            <span class="play-mark" aria-hidden="true">↗</span>
+          </div>
+          <div>
+            <div class="game-title">${game.title}</div>
+            <div class="game-category">${game.category}</div>
+          </div>
+        </a>
+      `).join("");
+
+      count.textContent = `${filtered.length} of ${games.length} games`;
+      empty.style.display = filtered.length ? "none" : "block";
+      grid.style.display = filtered.length ? "grid" : "none";
+    }
+
+    search.addEventListener("input", event => renderGames(event.target.value));
+    renderGames();
+  </script>
 </body>
 </html>
